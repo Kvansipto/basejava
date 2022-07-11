@@ -19,6 +19,8 @@ public class ArrayStorage {
         size++;
     }
 
+
+
     Resume get(String uuid) {
         for (Resume resume : getAll()) {
             if (uuid.equals(resume.uuid)) {
