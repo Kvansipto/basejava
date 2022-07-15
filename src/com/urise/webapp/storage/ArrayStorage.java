@@ -8,21 +8,20 @@ import java.util.Arrays;
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
-    int size = 0;
+    protected static final int STORAGE_LIMIT = 10000;
+    private final Resume[] storage = new Resume[STORAGE_LIMIT];
+    private int size = 0;
 
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            storage[i] = null;
-        }
+        Arrays.fill(storage, null);
         size = 0;
     }
 
     public void save(Resume r) {
-        if (resumeExist(r.uuid)) {
-            System.out.println("ERROR: резюме c uuid= " + r.uuid + " уже есть");
-        } else if (size + 1 > storage.length) {
+        if (size + 1 > STORAGE_LIMIT) {
             System.out.println("ERROR: нет места для добавления резюме " + r.uuid);
+        } else if (findIndex(r.uuid) > -1) {
+            System.out.println("ERROR: резюме c uuid= " + r.uuid + " уже есть");
         } else {
             storage[size] = r;
             size++;
@@ -30,55 +29,40 @@ public class ArrayStorage {
     }
 
     public void update(Resume r) {
-        if (!resumeExist(r.uuid)) {
+        if (findIndex(r.uuid) < 0) {
             System.out.println("ERROR: резюме c uuid= " + r.uuid + " не существует");
         } else {
-            for (int i = 0; i < size; i++) {
-                if (storage[i].uuid.equals(r.uuid)) {
-                    storage[i] = r;
-                }
-            }
+            storage[findIndex(r.uuid)] = r;
             System.out.println("Resume " + r.uuid + " was updated");
         }
     }
 
     public Resume get(String uuid) {
-        if (!resumeExist(uuid)) {
+        if (findIndex(uuid) < 0) {
             System.out.println("ERROR: резюме c uuid= " + uuid + " не существует");
             return null;
         } else {
-            for (Resume resume : getAll()) {
-                if (uuid.equals(resume.uuid)) {
-                    return resume;
-                }
-            }
+            return storage[findIndex(uuid)];
         }
-        return null;
     }
 
     public void delete(String uuid) {
-        if (!resumeExist(uuid)) {
+        int index = findIndex(uuid);
+        if (index < 0) {
             System.out.println("ERROR: резюме c uuid= " + uuid + " не существует");
         } else {
-            for (int i = 0; i < size; i++) {
-                if (storage[i].uuid.equals(uuid)) {
-                    System.arraycopy(storage, i + 1, storage, i, size - i - 1);
-                    size--;
-                }
-                i++;
-            }
+            System.arraycopy(storage, index + 1, storage, index, size - index - 1);
+            size--;
         }
     }
 
-    private boolean resumeExist(String uuid) {
-        boolean found = false;
+    private int findIndex(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].uuid.equals(uuid)) {
-                found = true;
-                break;
+                return i;
             }
         }
-        return found;
+        return -1;
     }
 
     /**
