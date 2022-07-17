@@ -7,8 +7,9 @@ import java.util.Arrays;
 /**
  * Array based storage for Resumes
  */
-public class ArrayStorage {
+public class ArrayStorage extends AbstractArrayStorage {
     protected static final int STORAGE_LIMIT = 10000;
+
     private final Resume[] storage = new Resume[STORAGE_LIMIT];
     private int size = 0;
 
@@ -19,9 +20,9 @@ public class ArrayStorage {
 
     public void save(Resume r) {
         if (size + 1 > STORAGE_LIMIT) {
-            System.out.println("ERROR: нет места для добавления резюме " + r.uuid);
-        } else if (findIndex(r.uuid) > -1) {
-            System.out.println("ERROR: резюме c uuid= " + r.uuid + " уже есть");
+            System.out.println("Storage overflow");
+        } else if (findIndex(r.getUuid()) > -1) {
+            System.out.println("Resume " + r.getUuid() + " already exist");
         } else {
             storage[size] = r;
             size++;
@@ -29,18 +30,19 @@ public class ArrayStorage {
     }
 
     public void update(Resume r) {
-        if (findIndex(r.uuid) < 0) {
-            System.out.println("ERROR: резюме c uuid= " + r.uuid + " не существует");
+        int index = findIndex(r.getUuid());
+        if (index < 0) {
+            System.out.println("Resume " + r.getUuid() + " not exist");
         } else {
-            storage[findIndex(r.uuid)] = r;
-            System.out.println("Resume " + r.uuid + " was updated");
+            storage[index] = r;
+            System.out.println("Resume " + r.getUuid() + " was updated");
         }
     }
 
     public Resume get(String uuid) {
         int index = findIndex(uuid);
         if (index < 0) {
-            System.out.println("ERROR: резюме c uuid= " + uuid + " не существует");
+            System.out.println("Resume " + uuid + " not exist");
             return null;
         } else {
             return storage[index];
@@ -50,18 +52,18 @@ public class ArrayStorage {
     public void delete(String uuid) {
         int index = findIndex(uuid);
         if (index < 0) {
-            System.out.println("ERROR: резюме c uuid= " + uuid + " не существует");
+            System.out.println("Resume " + uuid + " not exist");
         } else {
-            storage[index] = storage[size - 1];
-            storage[size - 1] = null;
-//            System.arraycopy(storage, index + 1, storage, index, size - index - 1);
             size--;
+            storage[index] = storage[size];
+            storage[size] = null;
+//            System.arraycopy(storage, index + 1, storage, index, size - index - 1);
         }
     }
 
-    private int findIndex(String uuid) {
+    protected int findIndex(String uuid) {
         for (int i = 0; i < size; i++) {
-            if (storage[i].uuid.equals(uuid)) {
+            if (uuid.equals(storage[i].getUuid())) {
                 return i;
             }
         }
