@@ -13,7 +13,7 @@ public class ArrayStorage {
     private int size = 0;
 
     public void clear() {
-        Arrays.fill(storage, null);
+        Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
@@ -38,11 +38,12 @@ public class ArrayStorage {
     }
 
     public Resume get(String uuid) {
-        if (findIndex(uuid) < 0) {
+        int index = findIndex(uuid);
+        if (index < 0) {
             System.out.println("ERROR: резюме c uuid= " + uuid + " не существует");
             return null;
         } else {
-            return storage[findIndex(uuid)];
+            return storage[index];
         }
     }
 
@@ -51,7 +52,9 @@ public class ArrayStorage {
         if (index < 0) {
             System.out.println("ERROR: резюме c uuid= " + uuid + " не существует");
         } else {
-            System.arraycopy(storage, index + 1, storage, index, size - index - 1);
+            storage[index] = storage[size - 1];
+            storage[size - 1] = null;
+//            System.arraycopy(storage, index + 1, storage, index, size - index - 1);
             size--;
         }
     }
