@@ -26,8 +26,6 @@ public abstract class AbstractStorage implements Storage {
 
     public void save(Resume r) {
         Object searchKey = getNotExistedSearchKey(r.getUuid());
-//        if (size >= STORAGE_LIMIT) {
-//            throw new StorageException("Storage overflow", r.getUuid());
         doSave(r, searchKey);
     }
 

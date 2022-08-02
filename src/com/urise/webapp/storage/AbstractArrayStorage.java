@@ -54,6 +54,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected void doDelete(Object searchKey) {
         size--;
         deleteResume((Integer) searchKey);
+        storage[size] = null;
     }
 
     protected abstract void insertResume(Resume r, int index);
