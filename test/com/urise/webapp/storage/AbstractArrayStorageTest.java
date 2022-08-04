@@ -56,7 +56,7 @@ public abstract class AbstractArrayStorageTest {
         storage.save(RESUME_4);
         assertSize(4);
         assertGet(RESUME_4);
-        assertArrayEquals(expected, storage.getAll());
+        arrayEquals(expected, storage.getAll());
     }
 
     @Test
@@ -79,7 +79,7 @@ public abstract class AbstractArrayStorageTest {
         Resume[] expected = new Resume[]{RESUME_1, RESUME_2, RESUME_3};
         Resume[] actual = storage.getAll();
         assertEquals(3, actual.length);
-        assertArrayEquals(expected, actual);
+        arrayEquals(expected, actual);
     }
 
     @Test
@@ -123,5 +123,9 @@ public abstract class AbstractArrayStorageTest {
 
     private void assertSize(int size) {
         assertEquals(size, storage.size());
+    }
+
+    protected void arrayEquals(Resume[] expected, Resume[] actual) {
+        assertArrayEquals(expected, actual);
     }
 }
