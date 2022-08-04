@@ -4,60 +4,53 @@ import com.urise.webapp.model.Resume;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class MapStorage extends AbstractStorage {
 
-    private final Map<String, Resume> hashmap = new HashMap<>();
+    private final Map<String, Resume> storage = new HashMap<>();
 
     @Override
     protected Object getSearchKey(String uuid) {
-        final Set<Map.Entry<String, Resume>> entries = hashmap.entrySet();
-        for (Map.Entry<String, Resume> entry : entries) {
-            if (entry.getKey().equals(uuid)) {
-                return entry.getKey();
-            }
-        }
-        return null;
+        return uuid;
     }
 
     @Override
     protected boolean isExist(Object searchKey) {
-        return searchKey != null;
+        return storage.containsKey(searchKey.toString());
     }
 
     @Override
     protected void doUpdate(Resume r, Object searchKey) {
-        hashmap.put(r.getUuid(), r);
+        storage.replace(searchKey.toString(), r);
     }
 
     @Override
     protected Resume doGet(Object searchKey) {
-        return hashmap.get(searchKey.toString());
+        return storage.get(searchKey.toString());
     }
 
     @Override
     protected void doSave(Resume r, Object searchKey) {
-        hashmap.put(r.getUuid(), r);
+        storage.put(r.getUuid(), r);
     }
 
     @Override
     protected void doDelete(Object searchKey) {
-        hashmap.remove(searchKey.toString());
+        storage.remove(searchKey.toString());
     }
 
     @Override
     public void clear() {
-        hashmap.clear();
+        storage.clear();
     }
 
     @Override
     public Resume[] getAll() {
-        return hashmap.values().toArray(new Resume[0]);
+        return storage.values().toArray(new Resume[0]);
     }
 
     @Override
     public int size() {
-        return hashmap.size();
+        return storage.size();
     }
 }
