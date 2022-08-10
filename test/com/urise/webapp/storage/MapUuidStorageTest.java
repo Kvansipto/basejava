@@ -10,7 +10,7 @@ class MapUuidStorageTest extends AbstractArrayStorageTest {
 
     @Override
     @Disabled
-    void saveOverflow() {
+    public void saveOverflow() {
         super.saveOverflow();
     }
 }

@@ -36,7 +36,7 @@ public abstract class AbstractArrayStorageTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         storage.clear();
         storage.save(RESUME_1);
         storage.save(RESUME_2);
@@ -51,14 +51,14 @@ public abstract class AbstractArrayStorageTest {
     }
 
     @Test
-    void update() {
+    public void update() {
         Resume newResume = new Resume(UUID_3, "newName");
         storage.update(newResume);
         assertSame(newResume, storage.get(UUID_3));
     }
 
     @Test
-    void save() {
+    public void save() {
         List<Resume> expected = Arrays.stream(new Resume[]{RESUME_2, RESUME_3, RESUME_4, RESUME_1}).toList();
         storage.save(RESUME_4);
         assertSize(4);
@@ -67,21 +67,21 @@ public abstract class AbstractArrayStorageTest {
     }
 
     @Test
-    void get() {
+    public void get() {
         assertGet(RESUME_1);
         assertGet(RESUME_2);
         assertGet(RESUME_3);
     }
 
     @Test
-    void delete() {
+    public void delete() {
         storage.delete(UUID_2);
         assertSize(2);
         assertThrows(NotExistStorageException.class, () -> storage.get(UUID_2));
     }
 
     @Test
-    void getAll() {
+    public void getAll() {
         List<Resume> expected = Arrays.stream(new Resume[]{RESUME_2, RESUME_3, RESUME_1}).toList();
         List<Resume> actual = storage.getAllSorted();
         assertEquals(3, actual.size());
@@ -89,12 +89,12 @@ public abstract class AbstractArrayStorageTest {
     }
 
     @Test
-    void size() {
+    public void size() {
         assertSize(3);
     }
 
     @Test
-    void saveOverflow() {
+    public void saveOverflow() {
         storage.clear();
         for (int i = 0; i < STORAGE_LIMIT; i++) {
             storage.save(new Resume("Name"));
