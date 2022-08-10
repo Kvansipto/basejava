@@ -2,10 +2,10 @@ package com.urise.webapp.storage;
 
 import org.junit.jupiter.api.Disabled;
 
-class ListStorageTest extends AbstractArrayStorageTest {
+class MapUuidStorageTest extends AbstractArrayStorageTest {
 
-    public ListStorageTest() {
-        super(new ListStorage());
+    protected MapUuidStorageTest() {
+        super(new MapUuidStorage());
     }
 
     @Override
