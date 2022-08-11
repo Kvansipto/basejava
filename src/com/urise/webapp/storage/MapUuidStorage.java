@@ -42,6 +42,11 @@ public class MapUuidStorage extends AbstractStorage<String> {
     }
 
     @Override
+    protected List<Resume> doGetAllSorted() {
+        return storage.values().stream().toList();
+    }
+
+    @Override
     public void clear() {
         storage.clear();
     }

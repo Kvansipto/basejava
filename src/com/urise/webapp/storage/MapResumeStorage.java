@@ -18,7 +18,7 @@ public class MapResumeStorage extends AbstractStorage<Resume> {
 
     @Override
     protected boolean isExist(Resume resume) {
-        return storage.containsValue(resume);
+        return resume != null;
     }
 
     @Override
@@ -47,9 +47,8 @@ public class MapResumeStorage extends AbstractStorage<Resume> {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        Comparator<Resume> resumeComparator = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
-        return storage.values().stream().sorted(resumeComparator).toList();
+    protected List<Resume> doGetAllSorted() {
+        return storage.values().stream().toList();
     }
 
     @Override
