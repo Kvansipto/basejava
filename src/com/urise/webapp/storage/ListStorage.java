@@ -16,11 +16,6 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume[] getAll() {
-        return list.toArray(new Resume[0]);
-    }
-
-    @Override
     public int size() {
         return list.size();
     }
@@ -59,5 +54,10 @@ public class ListStorage extends AbstractStorage {
     protected void doDelete(Object searchKey) {
         list.remove(((Integer) searchKey).intValue());
 
+    }
+
+    @Override
+    protected List<Resume> doGetAllSorted() {
+        return list;
     }
 }
