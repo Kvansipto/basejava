@@ -2,10 +2,7 @@ package com.urise.webapp;
 
 import com.urise.webapp.model.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 public class ResumeTestData {
     public static void main(String[] args) {
@@ -25,10 +22,15 @@ public class ResumeTestData {
         SectionContentList qualifications = new SectionContentList(
                 new ArrayList<>(Arrays.asList("first qualify", "second qualify", "third qualify")));
 
-        Company company1 = new Company(new Date(1999, 01, 01), (new Date(2006, 01, 01)), "Company1", "Manager", "did smth");
-        Company company2 = new Company(new Date(2007, 01, 01), (new Date(2009, 01, 01)), "Company2", "Manager2", "did smth2");
+        GregorianCalendar dateBegin1 = new GregorianCalendar(1999, Calendar.NOVEMBER, 1);
+        GregorianCalendar dateEnd1 = new GregorianCalendar(2007, Calendar.NOVEMBER, 1);
+        GregorianCalendar dateBegin2 = new GregorianCalendar(2008, Calendar.NOVEMBER, 1);
+        GregorianCalendar dateEnd2 = new GregorianCalendar(2010, Calendar.NOVEMBER, 1);
 
-        CompanySection exprience = new CompanySection(Arrays.asList(company1, company2));
+        Company company1 = new Company(dateBegin1, dateEnd1, "Company1", "Manager", "did smth");
+        Company company2 = new Company(dateBegin2, dateEnd2, "Company2", "Manager2", "did smth2");
+
+        CompanySection experience = new CompanySection(Arrays.asList(company1, company2));
 
         CompanySection education = new CompanySection(Arrays.asList(company1, company2));
 
@@ -36,7 +38,7 @@ public class ResumeTestData {
         r1.sectionMap.put(SectionType.OBJECTIVE, objective);
         r1.sectionMap.put(SectionType.ACHIEVEMENT, achievement);
         r1.sectionMap.put(SectionType.QUALIFICATIONS, qualifications);
-        r1.sectionMap.put(SectionType.EXPERIENCE, exprience);
+        r1.sectionMap.put(SectionType.EXPERIENCE, experience);
         r1.sectionMap.put(SectionType.EDUCATION, education);
 
         for (Map.Entry<ContactType, String> entry : r1.contactMap.entrySet()) {

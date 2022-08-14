@@ -1,16 +1,16 @@
 package com.urise.webapp.model;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 public class Company {
-    private final Date dateBegin;
-    private final Date dateEnd;
+    private final GregorianCalendar dateBegin;
+    private final GregorianCalendar dateEnd;
     private final String companyName;
     private final String position;
     private final String content;
 
-    public Company(Date dateBegin, Date dateEnd, String companyName, String position, String content) {
+    public Company(GregorianCalendar dateBegin, GregorianCalendar dateEnd, String companyName, String position, String content) {
         this.dateBegin = dateBegin;
         this.dateEnd = dateEnd;
         this.companyName = companyName;
