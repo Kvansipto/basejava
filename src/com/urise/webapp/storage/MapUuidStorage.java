@@ -2,7 +2,7 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.model.Resume;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,18 +43,12 @@ public class MapUuidStorage extends AbstractStorage<String> {
 
     @Override
     protected List<Resume> doGetAllSorted() {
-        return storage.values().stream().toList();
+        return new ArrayList<>(storage.values());
     }
 
     @Override
     public void clear() {
         storage.clear();
-    }
-
-    @Override
-    public List<Resume> getAllSorted() {
-        Comparator<Resume> resumeComparator = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
-        return storage.values().stream().sorted(resumeComparator).toList();
     }
 
     @Override
