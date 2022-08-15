@@ -1,17 +1,20 @@
 package com.urise.webapp.model;
 
-import java.util.List;
 import java.util.Objects;
 
-public class SectionContentList extends Section {
+public class TextSection extends Section {
+    private final String content;
 
-    private final List<String> content;
-
-    public SectionContentList(List<String> content) {
+    public TextSection(String content) {
         this.content = content;
     }
 
-    public List<String> getContent() {
+    public String getContent() {
+        return content;
+    }
+
+    @Override
+    public String toString() {
         return content;
     }
 
@@ -19,17 +22,12 @@ public class SectionContentList extends Section {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SectionContentList that = (SectionContentList) o;
+        TextSection that = (TextSection) o;
         return Objects.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(content);
-    }
-
-    @Override
-    public String toString() {
-        return content.toString();
     }
 }

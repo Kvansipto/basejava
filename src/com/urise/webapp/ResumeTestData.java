@@ -13,13 +13,13 @@ public class ResumeTestData {
         r1.contactMap.put(ContactType.Skype, "dwbydu21");
         r1.contactMap.put(ContactType.GITHUB, "www.github.com");
 
-        SectionContent personal = new SectionContent("personal content");
-        SectionContent objective = new SectionContent("objective content");
+        TextSection personal = new TextSection("personal content");
+        TextSection objective = new TextSection("objective content");
 
-        SectionContentList achievement = new SectionContentList(
+        ListSection achievement = new ListSection(
                 new ArrayList<>(Arrays.asList("first achieve", "second achieve", "third achieve")));
 
-        SectionContentList qualifications = new SectionContentList(
+        ListSection qualifications = new ListSection(
                 new ArrayList<>(Arrays.asList("first qualify", "second qualify", "third qualify")));
 
         GregorianCalendar dateBegin1 = new GregorianCalendar(1999, Calendar.NOVEMBER, 1);
@@ -27,8 +27,19 @@ public class ResumeTestData {
         GregorianCalendar dateBegin2 = new GregorianCalendar(2008, Calendar.NOVEMBER, 1);
         GregorianCalendar dateEnd2 = new GregorianCalendar(2010, Calendar.NOVEMBER, 1);
 
-        Company company1 = new Company(dateBegin1, dateEnd1, "Company1", "Manager", "did smth");
-        Company company2 = new Company(dateBegin2, dateEnd2, "Company2", "Manager2", "did smth2");
+        Company.Period period1 = new Company.Period(dateBegin1, dateEnd1, "Manager", "did smth");
+        Company.Period period2 = new Company.Period(dateBegin1, dateEnd1, "Manager1", "did smth1");
+        Company.Period period3 = new Company.Period(dateBegin2, dateEnd2, "Manager2", "did smth2");
+
+        ArrayList<Company.Period> periodArrayList1 = new ArrayList<>();
+        ArrayList<Company.Period> periodArrayList2 = new ArrayList<>();
+
+        periodArrayList1.add(period1);
+        periodArrayList1.add(period2);
+        periodArrayList2.add(period3);
+
+        Company company1 = new Company("Company1", periodArrayList1);
+        Company company2 = new Company("Company2", periodArrayList2);
 
         CompanySection experience = new CompanySection(Arrays.asList(company1, company2));
 
