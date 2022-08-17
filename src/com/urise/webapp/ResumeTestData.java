@@ -2,11 +2,14 @@ package com.urise.webapp;
 
 import com.urise.webapp.model.*;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ResumeTestData {
-    public static void main(String[] args) {
-        Resume r1 = new Resume("uuid5", "A");
+
+    public static Resume createResume(String uuid, String fullName) {
+        Resume r1 = new Resume(uuid, fullName);
 
         r1.contactMap.put(ContactType.EMAIL, "email");
         r1.contactMap.put(ContactType.PHONE, "+72873158212");
@@ -22,10 +25,10 @@ public class ResumeTestData {
         ListSection qualifications = new ListSection(
                 new ArrayList<>(Arrays.asList("first qualify", "second qualify", "third qualify")));
 
-        GregorianCalendar dateBegin1 = new GregorianCalendar(1999, Calendar.NOVEMBER, 1);
-        GregorianCalendar dateEnd1 = new GregorianCalendar(2007, Calendar.NOVEMBER, 1);
-        GregorianCalendar dateBegin2 = new GregorianCalendar(2008, Calendar.NOVEMBER, 1);
-        GregorianCalendar dateEnd2 = new GregorianCalendar(2010, Calendar.NOVEMBER, 1);
+        LocalDate dateBegin1 = LocalDate.of(1999, 10, 1);
+        LocalDate dateEnd1 = LocalDate.of(2007, 10, 1);
+        LocalDate dateBegin2 = LocalDate.of(2008, 10, 1);
+        LocalDate dateEnd2 = LocalDate.of(2010, 10, 1);
 
         Company.Period period1 = new Company.Period(dateBegin1, dateEnd1, "Manager", "did smth");
         Company.Period period2 = new Company.Period(dateBegin1, dateEnd1, "Manager1", "did smth1");
@@ -52,14 +55,6 @@ public class ResumeTestData {
         r1.sectionMap.put(SectionType.EXPERIENCE, experience);
         r1.sectionMap.put(SectionType.EDUCATION, education);
 
-        for (Map.Entry<ContactType, String> entry : r1.contactMap.entrySet()) {
-            System.out.println(entry.getKey().toString());
-            System.out.println(entry.getValue());
-        }
-
-        for (Map.Entry<SectionType, Section> entry : r1.sectionMap.entrySet()) {
-            System.out.println(entry.getKey().toString());
-            System.out.println(entry.getValue().toString());
-        }
+        return r1;
     }
 }

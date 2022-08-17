@@ -10,6 +10,10 @@ public class CompanySection extends Section {
         this.companies = companies;
     }
 
+    public List<Company> getCompanies() {
+        return companies;
+    }
+
     @Override
     public String toString() {
         return "CompanySection{" +
