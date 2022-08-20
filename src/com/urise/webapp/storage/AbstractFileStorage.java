@@ -28,12 +28,10 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         File[] listFiles = directory.listFiles();
         if (listFiles == null) {
             throw new StorageException("IO error", directory.getName() + " does not denote a directory");
-        } else {
-            for (File file : listFiles) {
-                doDelete(file);
-            }
         }
+        for (File file : listFiles) doDelete(file);
     }
+
 
     @Override
     public int size() {
@@ -41,12 +39,9 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         File[] listFiles = directory.listFiles();
         if (listFiles == null) {
             throw new StorageException("IO error", directory.getName() + " does not denote a directory");
-        } else {
-            for (File file : listFiles) {
-                count++;
-            }
-            return count;
         }
+        for (File file : listFiles) count++;
+        return count;
     }
 
     @Override
@@ -83,9 +78,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         try {
             return doRead(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new StorageException("IO error", file.getName(), e);
         }
-        return null;
     }
 
     @Override
@@ -102,16 +96,15 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         File[] listFiles = directory.listFiles();
         if (listFiles == null) {
             throw new StorageException("IO error", directory.getName() + " does not denote a directory");
-        } else {
-            for (File file : listFiles) {
-                try {
-                    resumes.add(doRead(file));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return resumes;
         }
+        for (File file : listFiles) {
+            try {
+                resumes.add(doRead(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return resumes;
     }
 
     protected abstract void doWrite(Resume r, File file) throws IOException;
