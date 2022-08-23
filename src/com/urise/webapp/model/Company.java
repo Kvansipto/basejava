@@ -1,10 +1,13 @@
 package com.urise.webapp.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Company {
+public class Company implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final String name;
     private final ArrayList<Period> periods;
 
@@ -34,7 +37,7 @@ public class Company {
         return Objects.hash(name, periods);
     }
 
-    public static class Period {
+    public static class Period implements Serializable {
 
         private final LocalDate dateBegin;
         private final LocalDate dateEnd;
