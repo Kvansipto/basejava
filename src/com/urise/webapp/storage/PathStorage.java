@@ -2,11 +2,10 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
-import com.urise.webapp.serializer.Serializer;
+import com.urise.webapp.storage.serializer.Serializer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,11 +60,11 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected void doSave(Resume r, Path path) {
         try {
-            File file = Files.createFile(path).toFile();
-            serializer.doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
+            Files.createFile(path);
         } catch (IOException e) {
-            throw new StorageException("IO error", r.getUuid(), e);
+            throw new StorageException("Save file error", r.getUuid(), e);
         }
+        doUpdate(r, path);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new StorageException("IO error", path.getName(0) + " is not deleted");
+            throw new StorageException("Delete file error: ", path.getName(0) + " is not deleted");
         }
     }
 
