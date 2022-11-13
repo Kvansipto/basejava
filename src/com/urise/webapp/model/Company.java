@@ -1,19 +1,31 @@
 package com.urise.webapp.model;
 
+import com.urise.webapp.util.LocalDateAdapter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private final String name;
-    private final ArrayList<Period> periods;
+    private String name;
+    private ArrayList<Period> periods;
 
     public Company(String name, ArrayList<Company.Period> periods) {
         this.name = name;
         this.periods = periods;
+    }
+
+    public Company() {
     }
 
     public String getName() {
@@ -37,18 +49,24 @@ public class Company implements Serializable {
         return Objects.hash(name, periods);
     }
 
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class Period implements Serializable {
 
-        private final LocalDate dateBegin;
-        private final LocalDate dateEnd;
-        private final String title;
-        private final String description;
+        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        private LocalDate dateBegin;
+        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        private LocalDate dateEnd;
+        private String title;
+        private String description;
 
         public Period(LocalDate dateBegin, LocalDate dateEnd, String title, String description) {
             this.dateBegin = dateBegin;
             this.dateEnd = dateEnd;
             this.title = title;
             this.description = description;
+        }
+
+        public Period() {
         }
 
         public LocalDate getDateBegin() {
