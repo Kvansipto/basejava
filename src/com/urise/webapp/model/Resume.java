@@ -47,6 +47,10 @@ public class Resume implements Comparable<Resume>, Serializable {
         return contactMap;
     }
 
+    public void addContact(ContactType contactType, String contact) {
+        this.contactMap.put(contactType, contact);
+    }
+
     public String getUuid() {
         return uuid;
     }
