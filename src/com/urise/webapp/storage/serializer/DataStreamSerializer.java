@@ -25,27 +25,41 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeInt(sections.size());
             for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
                 dos.writeUTF(entry.getKey().name());
-                if (entry.getKey() == SectionType.PERSONAL || entry.getKey() == SectionType.OBJECTIVE) {
-                    dos.writeUTF(entry.getValue().toString());
-                } else if (entry.getKey() == SectionType.ACHIEVEMENT || entry.getKey() == SectionType.QUALIFICATIONS) {
-                    ListSection listSection = (ListSection) entry.getValue();
-                    dos.writeInt(listSection.getContent().size());
-                    for (String content : listSection.getContent()) {
-                        dos.writeUTF(content);
+                switch (entry.getKey()) {
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(entry.getValue().toString());
+
+                    case ACHIEVEMENT, QUALIFICATIONS -> {
+                        ListSection listSection = (ListSection) entry.getValue();
+                        List<String> content1 = listSection.getContent();
+                        dos.writeInt(content1.size());
+                        for (String content : listSection.getContent()) {
+                            dos.writeUTF(content);
+                        }
                     }
-                } else if (entry.getKey() == SectionType.EDUCATION || entry.getKey() == SectionType.EXPERIENCE) {
-                    CompanySection companySection = (CompanySection) entry.getValue();
-                    List<Company> companies = companySection.getCompanies();
-                    dos.writeInt(companies.size());
-                    for (Company company : companies) {
-                        dos.writeUTF(company.getName());
-                        ArrayList<Company.Period> periods = company.getPeriods();
-                        dos.writeInt(periods.size());
-                        for (Company.Period period : periods) {
-                            dos.writeUTF(period.getDateBegin().toString());
-                            dos.writeUTF(period.getDateEnd().toString());
-                            dos.writeUTF(period.getTitle());
-                            dos.writeUTF(period.getDescription());
+
+                    case EXPERIENCE, EDUCATION -> {
+                        CompanySection companySection = (CompanySection) entry.getValue();
+                        List<Company> companies = companySection.getCompanies();
+
+                        dos.writeInt(companies.size());
+                        for (Company company : companies) {
+                            dos.writeUTF(company.getName());
+                            ArrayList<Company.Period> periods = company.getPeriods();
+
+                            dos.writeInt(periods.size());
+                            for (Company.Period period : periods) {
+
+                                boolean descriptionIsExist = period.getDescription() != null;
+
+                                dos.writeBoolean(descriptionIsExist);
+
+                                writeDate(period.getDateBegin(), dos);
+                                writeDate(period.getDateEnd(), dos);
+
+                                dos.writeUTF(period.getTitle());
+
+                                if (descriptionIsExist) dos.writeUTF(period.getDescription());
+                            }
                         }
                     }
                 }
@@ -65,31 +79,50 @@ public class DataStreamSerializer implements StreamSerializer {
             size = dis.readInt();
             for (int i = 0; i < size; i++) {
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
-                if (sectionType == SectionType.PERSONAL || sectionType == SectionType.OBJECTIVE) {
-                    resume.addSection(sectionType, new TextSection(dis.readUTF()));
-                } else if (sectionType == SectionType.ACHIEVEMENT || sectionType == SectionType.QUALIFICATIONS) {
-                    List<String> list = new ArrayList<>();
-                    int sectionValueSize = dis.readInt();
-                    for (int x = 0; x < sectionValueSize; x++) {
-                        list.add(dis.readUTF());
+                switch (sectionType) {
+                    case PERSONAL, OBJECTIVE -> {
+                        resume.addSection(sectionType, new TextSection(dis.readUTF()));
                     }
-                    resume.addSection(sectionType, new ListSection(list));
-                } else if (sectionType == SectionType.EDUCATION || sectionType == SectionType.EXPERIENCE) {
-                    int companySize = dis.readInt();
-                    List<Company> companies = new ArrayList<>();
-                    for (int x = 0; x < companySize; x++) {
-                        String companyName = dis.readUTF();
-                        int periodSize = dis.readInt();
-                        ArrayList<Company.Period> periods = new ArrayList<>();
-                        for (int y = 0; y < periodSize; y++) {
-                            periods.add(new Company.Period(LocalDate.parse(dis.readUTF()), LocalDate.parse(dis.readUTF()), dis.readUTF(), dis.readUTF()));
+                    case ACHIEVEMENT, QUALIFICATIONS -> {
+                        List<String> list = new ArrayList<>();
+                        int sectionValueSize = dis.readInt();
+                        for (int x = 0; x < sectionValueSize; x++) {
+                            list.add(dis.readUTF());
                         }
-                        companies.add(new Company(companyName, periods));
+                        resume.addSection(sectionType, new ListSection(list));
                     }
-                    resume.addSection(sectionType, new CompanySection(companies));
+                    case EXPERIENCE, EDUCATION -> {
+                        int companySize = dis.readInt();
+                        List<Company> companies = new ArrayList<>();
+                        for (int x = 0; x < companySize; x++) {
+                            String companyName = dis.readUTF();
+
+                            int periodSize = dis.readInt();
+                            ArrayList<Company.Period> periods = new ArrayList<>();
+                            for (int y = 0; y < periodSize; y++) {
+                                if (dis.readBoolean()) {
+                                    periods.add(new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), dis.readUTF()));
+                                } else
+                                    periods.add(new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), null));
+                            }
+                            companies.add(new Company(companyName, periods));
+                        }
+                        resume.addSection(sectionType, new CompanySection(companies));
+                    }
                 }
             }
             return resume;
         }
+    }
+
+    private void writeDate(LocalDate localDate, DataOutputStream dos) throws IOException {
+        dos.writeInt(localDate.getYear());
+        dos.writeInt(localDate.getMonthValue());
+        dos.writeInt(localDate.getDayOfMonth());
+
+    }
+
+    private LocalDate readDate(DataInputStream dis) throws IOException {
+        return LocalDate.of(dis.readInt(), dis.readInt(), dis.readInt());
     }
 }
