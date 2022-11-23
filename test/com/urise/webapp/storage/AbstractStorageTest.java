@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractStorageTest {
+
+    protected static final File STORAGE_DIR = new File("/Users/sheldor/IdeaProjects/basejava/storage");
 
     private static final String UUID_1 = "uuid1";
     private static final String NAME_1 = "JohnD";
@@ -53,7 +56,7 @@ public abstract class AbstractStorageTest {
     public void update() {
         Resume newResume = new Resume(UUID_3, "newName");
         storage.update(newResume);
-        assertSame(newResume, storage.get(UUID_3));
+        assertEquals(newResume, storage.get(UUID_3));
     }
 
     @Test
