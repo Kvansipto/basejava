@@ -15,7 +15,16 @@ public class DataStreamSerializer implements StreamSerializer {
 
         dos.writeInt(collection.size());
         for (T v : collection) {
-            consumer.write(v);
+            consumer.accept(v);
+        }
+    }
+
+    public <T> void readWithException(DataInputStream dis, DataStreamCollectionConsumer<T> consumer) throws IOException {
+
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            T t = null;
+            consumer.accept(t);
         }
     }
 
@@ -50,52 +59,40 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
-
     public Resume doRead(InputStream is) throws IOException {
         try (DataInputStream dis = new DataInputStream(is)) {
-            String uuid = dis.readUTF();
-            String fullName = dis.readUTF();
-            Resume resume = new Resume(uuid, fullName);
-            int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
-            size = dis.readInt();
-            for (int i = 0; i < size; i++) {
+
+            Resume resume = new Resume(dis.readUTF(), dis.readUTF());
+            readWithException(dis, t -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readWithException(dis, t -> {
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
+
                 switch (sectionType) {
-                    case PERSONAL, OBJECTIVE -> {
-                        resume.addSection(sectionType, new TextSection(dis.readUTF()));
-                    }
+                    case PERSONAL, OBJECTIVE -> resume.addSection(sectionType, new TextSection(dis.readUTF()));
+
                     case ACHIEVEMENT, QUALIFICATIONS -> {
                         List<String> list = new ArrayList<>();
-                        int sectionValueSize = dis.readInt();
-                        for (int x = 0; x < sectionValueSize; x++) {
-                            list.add(dis.readUTF());
-                        }
+                        readWithException(dis, t1 -> list.add(dis.readUTF()));
                         resume.addSection(sectionType, new ListSection(list));
                     }
                     case EXPERIENCE, EDUCATION -> {
-                        int companySize = dis.readInt();
                         List<Company> companies = new ArrayList<>();
-                        for (int x = 0; x < companySize; x++) {
+                        readWithException(dis, t1 -> {
                             String companyName = dis.readUTF();
-
-                            int periodSize = dis.readInt();
                             ArrayList<Company.Period> periods = new ArrayList<>();
-                            for (int y = 0; y < periodSize; y++) {
+                            readWithException(dis, t2 -> {
                                 String desc = null;
                                 if (dis.readBoolean()) {
                                     desc = dis.readUTF();
                                 }
                                 periods.add(new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc));
-                            }
+                            });
                             companies.add(new Company(companyName, periods));
-                        }
+                        });
                         resume.addSection(sectionType, new CompanySection(companies));
                     }
                 }
-            }
+            });
             return resume;
         }
     }
