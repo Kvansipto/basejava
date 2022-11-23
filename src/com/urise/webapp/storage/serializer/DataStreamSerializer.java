@@ -11,7 +11,7 @@ import java.util.List;
 
 public class DataStreamSerializer implements StreamSerializer {
 
-    public <T> void writeWithException(Collection<T> collection, DataOutputStream dos, DataStreamCollectionConsumer<T> consumer) throws IOException {
+    public <T> void writeWithException(Collection<T> collection, DataOutputStream dos, DataStreamWriteConsumer<T> consumer) throws IOException {
 
         dos.writeInt(collection.size());
         for (T v : collection) {
@@ -19,12 +19,11 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
-    public <T> void readWithException(DataInputStream dis, DataStreamCollectionConsumer<T> consumer) throws IOException {
+    public <T> void readWithException(DataInputStream dis, DataStreamReadConsumer consumer) throws IOException {
 
         int size = dis.readInt();
         for (int i = 0; i < size; i++) {
-            T t = null;
-            consumer.accept(t);
+            consumer.accept();
         }
     }
 
@@ -63,8 +62,9 @@ public class DataStreamSerializer implements StreamSerializer {
         try (DataInputStream dis = new DataInputStream(is)) {
 
             Resume resume = new Resume(dis.readUTF(), dis.readUTF());
-            readWithException(dis, t -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
-            readWithException(dis, t -> {
+
+            readWithException(dis, () -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readWithException(dis, () -> {
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
 
                 switch (sectionType) {
@@ -72,15 +72,15 @@ public class DataStreamSerializer implements StreamSerializer {
 
                     case ACHIEVEMENT, QUALIFICATIONS -> {
                         List<String> list = new ArrayList<>();
-                        readWithException(dis, t1 -> list.add(dis.readUTF()));
+                        readWithException(dis, () -> list.add(dis.readUTF()));
                         resume.addSection(sectionType, new ListSection(list));
                     }
                     case EXPERIENCE, EDUCATION -> {
                         List<Company> companies = new ArrayList<>();
-                        readWithException(dis, t1 -> {
+                        readWithException(dis, () -> {
                             String companyName = dis.readUTF();
                             ArrayList<Company.Period> periods = new ArrayList<>();
-                            readWithException(dis, t2 -> {
+                            readWithException(dis, () -> {
                                 String desc = null;
                                 if (dis.readBoolean()) {
                                     desc = dis.readUTF();
