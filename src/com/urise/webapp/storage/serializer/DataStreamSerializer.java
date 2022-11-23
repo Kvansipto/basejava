@@ -27,6 +27,13 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
+    public <T> List<T> addListWithException(DataStreamListConsumer<List<T>> consumer) throws IOException {
+
+        List<T> t = new ArrayList<>();
+        consumer.accept(t);
+        return t;
+    }
+
     public void doWrite(Resume r, OutputStream os) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(os)) {
             dos.writeUTF(r.getUuid());
@@ -69,28 +76,15 @@ public class DataStreamSerializer implements StreamSerializer {
 
                 switch (sectionType) {
                     case PERSONAL, OBJECTIVE -> resume.addSection(sectionType, new TextSection(dis.readUTF()));
-
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        List<String> list = new ArrayList<>();
-                        readWithException(dis, () -> list.add(dis.readUTF()));
-                        resume.addSection(sectionType, new ListSection(list));
-                    }
-                    case EXPERIENCE, EDUCATION -> {
-                        List<Company> companies = new ArrayList<>();
-                        readWithException(dis, () -> {
-                            String companyName = dis.readUTF();
-                            ArrayList<Company.Period> periods = new ArrayList<>();
-                            readWithException(dis, () -> {
-                                String desc = null;
-                                if (dis.readBoolean()) {
-                                    desc = dis.readUTF();
-                                }
-                                periods.add(new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc));
-                            });
-                            companies.add(new Company(companyName, periods));
-                        });
-                        resume.addSection(sectionType, new CompanySection(companies));
-                    }
+                    case ACHIEVEMENT, QUALIFICATIONS -> resume.addSection(sectionType, new ListSection(addListWithException((t) -> readWithException(dis, () -> t.add(dis.readUTF())))));
+                    case EXPERIENCE, EDUCATION -> resume.addSection(sectionType, new CompanySection(addListWithException(t -> readWithException(dis, () -> {
+                        String companyName = dis.readUTF();
+                        t.add(new Company(companyName, addListWithException(t1 -> readWithException(dis, () -> {
+                            String desc = null;
+                            if (dis.readBoolean()) desc = dis.readUTF();
+                            t1.add(new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc));
+                        }))));
+                    }))));
                 }
             });
             return resume;
@@ -101,7 +95,6 @@ public class DataStreamSerializer implements StreamSerializer {
         dos.writeInt(localDate.getYear());
         dos.writeInt(localDate.getMonthValue());
         dos.writeInt(localDate.getDayOfMonth());
-
     }
 
     private LocalDate readDate(DataInputStream dis) throws IOException {

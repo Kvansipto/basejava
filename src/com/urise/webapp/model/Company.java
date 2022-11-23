@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -18,9 +18,9 @@ public class Company implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private ArrayList<Period> periods;
+    private List<Period> periods;
 
-    public Company(String name, ArrayList<Company.Period> periods) {
+    public Company(String name, List<Company.Period> periods) {
         this.name = name;
         this.periods = periods;
     }
@@ -32,7 +32,7 @@ public class Company implements Serializable {
         return name;
     }
 
-    public ArrayList<Period> getPeriods() {
+    public List<Period> getPeriods() {
         return periods;
     }
 
