@@ -27,11 +27,17 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
-    public <T> List<T> addListWithException(DataStreamListConsumer<List<T>> consumer) throws IOException {
+    public <T> List<T> addListWithException(DataStreamListConsumer<T> consumer, DataInputStream dis) throws IOException {
 
-        List<T> t = new ArrayList<>();
-        consumer.accept(t);
-        return t;
+//        List<T> t = new ArrayList<>();
+//        consumer.accept(t);
+
+        List<T> list = new ArrayList<>();
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            list.add(consumer.accept());
+        }
+        return list;
     }
 
     public void doWrite(Resume r, OutputStream os) throws IOException {
@@ -76,20 +82,37 @@ public class DataStreamSerializer implements StreamSerializer {
 
                 switch (sectionType) {
                     case PERSONAL, OBJECTIVE -> resume.addSection(sectionType, new TextSection(dis.readUTF()));
-                    case ACHIEVEMENT, QUALIFICATIONS -> resume.addSection(sectionType, new ListSection(addListWithException((t) -> readWithException(dis, () -> t.add(dis.readUTF())))));
-                    case EXPERIENCE, EDUCATION -> resume.addSection(sectionType, new CompanySection(addListWithException(t -> readWithException(dis, () -> {
-                        String companyName = dis.readUTF();
-                        t.add(new Company(companyName, addListWithException(t1 -> readWithException(dis, () -> {
-                            String desc = null;
-                            if (dis.readBoolean()) desc = dis.readUTF();
-                            t1.add(new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc));
-                        }))));
-                    }))));
+
+
+                    case ACHIEVEMENT, QUALIFICATIONS -> {
+                        DataStreamListConsumer<String> listDataStreamListConsumer = () -> {
+                            return dis.readUTF();
+                        };
+                        List<String> content = addListWithException(listDataStreamListConsumer, dis);
+                        resume.addSection(sectionType, new ListSection(content));
+                    }
+                    case EXPERIENCE, EDUCATION -> {
+                        DataStreamListConsumer<Company> companyDataStreamListConsumer = () -> {
+
+                            DataStreamListConsumer<Company.Period> listDataStreamListConsumer = () -> {
+                                String desc = null;
+                                if (dis.readBoolean()) desc = dis.readUTF();
+
+                                Company.Period e = new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc);
+                                return e;
+                            };
+                            List<Company.Period> periods = addListWithException(listDataStreamListConsumer, dis);
+                            Company company = new Company(dis.readUTF(), periods);
+                            return company;
+                        };
+                        resume.addSection(sectionType, new CompanySection(addListWithException(companyDataStreamListConsumer, dis)));
+                    }
                 }
             });
             return resume;
         }
     }
+
 
     private void writeDate(LocalDate localDate, DataOutputStream dos) throws IOException {
         dos.writeInt(localDate.getYear());

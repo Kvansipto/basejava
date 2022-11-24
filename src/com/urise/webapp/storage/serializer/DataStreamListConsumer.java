@@ -5,5 +5,5 @@ import java.io.IOException;
 @FunctionalInterface
 public interface DataStreamListConsumer<T> {
 
-    void accept(T t) throws IOException;
+    T accept() throws IOException;
 }
