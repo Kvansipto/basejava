@@ -27,10 +27,7 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
-    public <T> List<T> addListWithException(DataStreamListConsumer<T> consumer, DataInputStream dis) throws IOException {
-
-//        List<T> t = new ArrayList<>();
-//        consumer.accept(t);
+    public <T> List<T> readListWithException(DataInputStream dis, DataStreamListConsumer<T> consumer) throws IOException {
 
         List<T> list = new ArrayList<>();
         int size = dis.readInt();
@@ -53,8 +50,8 @@ public class DataStreamSerializer implements StreamSerializer {
             writeWithException(r.getSectionMap().entrySet(), dos, t -> {
                 dos.writeUTF(t.getKey().name());
                 switch (t.getKey()) {
-                    case PERSONAL, OBJECTIVE -> dos.writeUTF(String.valueOf(t.getValue()));
-                    case ACHIEVEMENT, QUALIFICATIONS -> writeWithException(((ListSection) t.getValue()).getContent(), dos, v -> dos.writeUTF(String.valueOf(v)));
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(((TextSection) t.getValue()).getContent());
+                    case ACHIEVEMENT, QUALIFICATIONS -> writeWithException(((ListSection) t.getValue()).getContent(), dos, dos::writeUTF);
                     case EXPERIENCE, EDUCATION -> writeWithException(((CompanySection) t.getValue()).getCompanies(), dos, c -> {
                         dos.writeUTF(c.getName());
                         writeWithException(c.getPeriods(), dos, p -> {
@@ -82,31 +79,17 @@ public class DataStreamSerializer implements StreamSerializer {
 
                 switch (sectionType) {
                     case PERSONAL, OBJECTIVE -> resume.addSection(sectionType, new TextSection(dis.readUTF()));
-
-
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        DataStreamListConsumer<String> listDataStreamListConsumer = () -> {
-                            return dis.readUTF();
-                        };
-                        List<String> content = addListWithException(listDataStreamListConsumer, dis);
-                        resume.addSection(sectionType, new ListSection(content));
-                    }
-                    case EXPERIENCE, EDUCATION -> {
-                        DataStreamListConsumer<Company> companyDataStreamListConsumer = () -> {
-
-                            DataStreamListConsumer<Company.Period> listDataStreamListConsumer = () -> {
-                                String desc = null;
-                                if (dis.readBoolean()) desc = dis.readUTF();
-
-                                Company.Period e = new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc);
-                                return e;
-                            };
-                            List<Company.Period> periods = addListWithException(listDataStreamListConsumer, dis);
-                            Company company = new Company(dis.readUTF(), periods);
-                            return company;
-                        };
-                        resume.addSection(sectionType, new CompanySection(addListWithException(companyDataStreamListConsumer, dis)));
-                    }
+                    case ACHIEVEMENT, QUALIFICATIONS -> resume.addSection(sectionType, new ListSection(readListWithException(dis, dis::readUTF)));
+                    case EXPERIENCE, EDUCATION -> resume.addSection(sectionType, new
+                            CompanySection(readListWithException(dis, () -> new Company(
+                            dis.readUTF(), readListWithException(dis, () -> {
+                        String desc = null;
+                        if (dis.readBoolean()) {
+                            desc = dis.readUTF();
+                        }
+                        return new Company.Period(readDate(dis), readDate(dis), dis.readUTF(), desc);
+                    })
+                    ))));
                 }
             });
             return resume;
