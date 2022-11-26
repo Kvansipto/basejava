@@ -32,7 +32,7 @@ public class ResumeTestData {
 
         Company.Period period1 = new Company.Period(dateBegin1, dateEnd1, "Manager", "did smth");
         Company.Period period2 = new Company.Period(dateBegin1, dateEnd1, "Manager1", "did smth1");
-        Company.Period period3 = new Company.Period(dateBegin2, dateEnd2, "Manager2", "did smth2");
+        Company.Period period3 = new Company.Period(dateBegin2, dateEnd2, "Manager2", null);
 
         ArrayList<Company.Period> periodArrayList1 = new ArrayList<>();
         ArrayList<Company.Period> periodArrayList2 = new ArrayList<>();
