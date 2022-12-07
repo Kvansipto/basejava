@@ -9,6 +9,7 @@ Java 8 Streams:
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -25,10 +26,17 @@ public class StreamsHW12 {
     }
 
     private static int minValue(int[] values) {
-        return IntStream.of(values).distinct().sorted().reduce(0, (sum, p) -> sum = sum * 10 + p);
+        return IntStream.of(values)
+                .distinct()
+                .sorted()
+                .reduce(0, (sum, p) -> sum = sum * 10 + p);
     }
 
     private static List<Integer> oddOrEven(List<Integer> integers) {
-        return integers.stream().collect(Collectors.partitioningBy(s1 -> s1 % 2 == 0)).get(integers.stream().collect(Collectors.partitioningBy(s -> s % 2 == 0)).get(false).size() % 2 > 0);
+        Map<Boolean, List<Integer>> map = integers
+                .stream()
+                .collect(Collectors
+                        .partitioningBy(s1 -> s1 % 2 == 0));
+        return map.get(false).size() % 2 > 0 ? map.get(false) : map.get(true);
     }
 }
