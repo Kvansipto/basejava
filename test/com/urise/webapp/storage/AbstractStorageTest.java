@@ -1,5 +1,6 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.Config;
 import com.urise.webapp.ResumeTestData;
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
@@ -16,8 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractStorageTest {
 
-    protected static final File STORAGE_DIR = new File("/Users/sheldor/IdeaProjects/basejava/storage");
-
+    protected static final File STORAGE_DIR = Config.get().getStorageDir();
     private static final String UUID_1 = "uuid1";
     private static final String NAME_1 = "JohnD";
     private static final Resume RESUME_1 = ResumeTestData.createResume(UUID_1, NAME_1);
