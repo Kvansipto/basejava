@@ -1,5 +1,6 @@
 package com.urise.webapp;
 
+import com.urise.webapp.model.ContactType;
 import com.urise.webapp.model.Resume;
 
 public class ResumeTestData {
@@ -7,10 +8,10 @@ public class ResumeTestData {
     public static Resume createResume(String uuid, String fullName) {
         Resume r1 = new Resume(uuid, fullName);
 
-//        r1.contactMap.put(ContactType.EMAIL, "email");
-//        r1.contactMap.put(ContactType.PHONE, "+72873158212");
-//        r1.contactMap.put(ContactType.Skype, "dwbydu21");
-//        r1.contactMap.put(ContactType.GITHUB, "www.github.com");
+        r1.contactMap.put(ContactType.EMAIL, "email");
+        r1.contactMap.put(ContactType.PHONE, "+72873158212");
+        r1.contactMap.put(ContactType.Skype, "dwbydu21");
+        r1.contactMap.put(ContactType.GITHUB, "www.github.com");
 
 //        TextSection personal = new TextSection("personal content");
 //        TextSection objective = new TextSection("objective content");

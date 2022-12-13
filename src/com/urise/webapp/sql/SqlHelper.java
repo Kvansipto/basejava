@@ -1,8 +1,7 @@
 package com.urise.webapp.sql;
 
-import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.StorageException;
-import org.postgresql.util.PSQLException;
+import com.urise.webapp.util.ExceptionUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,9 +21,22 @@ public class SqlHelper {
             return sqlExecutor.execute(ps);
 
         } catch (SQLException e) {
-            if (e instanceof PSQLException && e.getSQLState().equals("23505")) {
-                throw new ExistStorageException(null);
+            throw ExceptionUtil.convertException(e);
+        }
+    }
+
+    public <T> T transactionExecute(SqlTransaction<T> executor) {
+        try (Connection connection = connectionFactory.getConnection()) {
+            try {
+                connection.setAutoCommit(false);
+                T res = executor.execute(connection);
+                connection.commit();
+                return res;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw ExceptionUtil.convertException(e);
             }
+        } catch (SQLException e) {
             throw new StorageException(e);
         }
     }
