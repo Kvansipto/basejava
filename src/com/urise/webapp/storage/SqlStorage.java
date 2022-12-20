@@ -107,37 +107,33 @@ public class SqlStorage implements Storage {
     @Override
     public List<Resume> getAllSorted() {
         Map<String, Resume> map = new LinkedHashMap<>();
-        sqlHelper.execute("""
-                SELECT * FROM resume r
-                ORDER BY r.full_name, r.uuid""", se -> {
-            ResultSet rs = se.executeQuery();
+        return sqlHelper.transactionExecute(conn -> {
+            PreparedStatement ps = conn.prepareStatement("""
+                    SELECT * FROM resume r
+                    ORDER BY r.full_name, r.uuid""");
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String uuid = rs.getString("uuid").trim();
                 Resume r = new Resume(uuid, rs.getString("full_name").trim());
                 map.put(uuid, r);
             }
-            return null;
-        });
-        sqlHelper.execute("SELECT * FROM contact c", se -> {
-            ResultSet rs = se.executeQuery();
+            ps = conn.prepareStatement("SELECT * FROM contact c");
+            rs = ps.executeQuery();
             while (rs.next()) {
                 addContact(rs, map.get(rs.getString("resume_uuid").trim()));
             }
-            return null;
-        });
-        sqlHelper.execute("""
-                SELECT * FROM sections s
-                LEFT JOIN section_type st
-                ON s.section_type_id = st.id
-                LEFT JOIN resume r
-                ON r.uuid = s.resume_uuid""", se -> {
-            ResultSet rs = se.executeQuery();
+            ps = conn.prepareStatement("""
+                    SELECT * FROM sections s
+                    LEFT JOIN section_type st
+                    ON s.section_type_id = st.id
+                    LEFT JOIN resume r
+                    ON r.uuid = s.resume_uuid""");
+            rs = ps.executeQuery();
             while (rs.next()) {
                 addSection(rs, map.get(rs.getString("resume_uuid").trim()));
             }
-            return null;
+            return new ArrayList<>(map.values());
         });
-        return new ArrayList<>(map.values());
     }
 
     @Override
