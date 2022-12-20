@@ -1,25 +1,28 @@
 package com.urise.webapp;
 
-import com.urise.webapp.model.Resume;
+import com.urise.webapp.model.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ResumeTestData {
 
     public static Resume createResume(String uuid, String fullName) {
         Resume r1 = new Resume(uuid, fullName);
 
-//        r1.contactMap.put(ContactType.EMAIL, "email");
-//        r1.contactMap.put(ContactType.PHONE, "+72873158212");
-//        r1.contactMap.put(ContactType.Skype, "dwbydu21");
-//        r1.contactMap.put(ContactType.GITHUB, "www.github.com");
+        r1.contactMap.put(ContactType.EMAIL, "email");
+        r1.contactMap.put(ContactType.PHONE, "+72873158212");
+        r1.contactMap.put(ContactType.Skype, "dwbydu21");
+        r1.contactMap.put(ContactType.GITHUB, "www.github.com");
 
-//        TextSection personal = new TextSection("personal content");
-//        TextSection objective = new TextSection("objective content");
+        TextSection personal = new TextSection("personal content");
+        TextSection objective = new TextSection("objective content");
 //
-//        ListSection achievement = new ListSection(
-//                new ArrayList<>(Arrays.asList("first achieve", "second achieve", "third achieve")));
-//
-//        ListSection qualifications = new ListSection(
-//                new ArrayList<>(Arrays.asList("first qualify", "second qualify", "third qualify")));
+        ListSection achievement = new ListSection(
+                new ArrayList<>(Arrays.asList("first achieve", "second achieve", "third achieve")));
+
+        ListSection qualifications = new ListSection(
+                new ArrayList<>(Arrays.asList("first qualify", "second qualify", "third qualify")));
 //
 //        LocalDate dateBegin1 = LocalDate.of(1999, 10, 1);
 //        LocalDate dateEnd1 = LocalDate.of(2007, 10, 1);
@@ -44,10 +47,10 @@ public class ResumeTestData {
 //
 //        CompanySection education = new CompanySection(Arrays.asList(company1, company2));
 
-//        r1.sectionMap.put(SectionType.PERSONAL, personal);
-//        r1.sectionMap.put(SectionType.OBJECTIVE, objective);
-//        r1.sectionMap.put(SectionType.ACHIEVEMENT, achievement);
-//        r1.sectionMap.put(SectionType.QUALIFICATIONS, qualifications);
+        r1.sectionMap.put(SectionType.PERSONAL, personal);
+        r1.sectionMap.put(SectionType.OBJECTIVE, objective);
+        r1.sectionMap.put(SectionType.ACHIEVEMENT, achievement);
+        r1.sectionMap.put(SectionType.QUALIFICATIONS, qualifications);
 //        r1.sectionMap.put(SectionType.EXPERIENCE, experience);
 //        r1.sectionMap.put(SectionType.EDUCATION, education);
 

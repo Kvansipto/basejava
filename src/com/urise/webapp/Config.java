@@ -1,7 +1,7 @@
 package com.urise.webapp;
 
+import com.urise.webapp.storage.SqlStorage;
 import com.urise.webapp.storage.Storage;
-import com.urise.webapp.storage.serializer.SqlStorage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Config {
-    private static final File PROPS = new File("config/resumes.properties");
+    private static final File PROPS = new File("/Users/sheldor/IdeaProjects/basejava/config/resumes.properties");
     public static final Config INSTANCE = new Config();
 
     private final Properties props = new Properties();
