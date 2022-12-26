@@ -80,4 +80,29 @@ alter table sections
 create unique index sections_id_uindex
     on sections (id);
 
+create table company_sections
+(
+    id              serial
+        constraint company_sections_pk
+            primary key,
+    section_type_id integer
+        constraint company_sections_section_type_id_fk
+            references section_type
+            on update cascade on delete cascade,
+    resume_uuid     varchar(36) not null
+        constraint company_sections_resume_uuid_fk
+            references resume
+            on update cascade on delete cascade,
+    company_name    varchar(36) not null,
+    date_from       date        not null,
+    date_to         date        not null,
+    text            text,
+    title           text        not null
+);
+
+alter table company_sections
+    owner to postgres;
+
+create unique index company_sections_id_uindex
+    on company_sections (id);
 
