@@ -2,6 +2,8 @@ package web;
 
 import com.urise.webapp.model.*;
 
+import java.time.LocalDate;
+
 public class HtmlUtil {
 
     public static String toHtml(ContactType contactType, String value) {
@@ -22,30 +24,48 @@ public class HtmlUtil {
     public static String toHtml(SectionType sectionType, Section section) {
         switch (sectionType) {
             case PERSONAL, OBJECTIVE -> {
-                return ("<h3>" + sectionType.getTitle() + "</h3>" + ((TextSection) section).getContent());
+                return (((TextSection) section).getContent());
             }
             case QUALIFICATIONS, ACHIEVEMENT -> {
-                StringBuilder sb = new StringBuilder("<h3>" + sectionType.getTitle() + "</h3>");
+                StringBuilder sb = new StringBuilder();
                 for (String s : ((ListSection) section).getContent()) {
-                    sb.append(s).append("<br/>");
+                    sb.append(s).append("\n");
                 }
-                sb.replace(sb.lastIndexOf("<"), sb.length(), "");
+                sb.replace(sb.lastIndexOf("\n"), sb.length(), "");
                 return String.valueOf(sb);
             }
             case EXPERIENCE, EDUCATION -> {
                 return "pusto";
             }
-            default -> {
-                return "pusto";
-            }
         }
+        return null;
     }
 
     public static String toHtml(String value) {
         return toLink(value, value);
     }
 
+    public static String toHtml(SectionType sectionType) {
+        return "<h3>" + sectionType.getTitle() + "</h3>";
+    }
+
     private static String toLink(String href, String title) {
         return "<a href='" + href + "'>" + title + "</a>";
+    }
+
+    public static String toHtml(Company.Period period) {
+        StringBuilder sb = new StringBuilder();
+        return String.valueOf(sb
+                .append(toHtmlDate(period.getDateBegin()))
+                .append(" - ")
+                .append(toHtmlDate(period.getDateEnd())));
+    }
+
+    private static String toHtmlDate(LocalDate date) {
+        StringBuilder sb = new StringBuilder();
+        return String.valueOf(sb
+                .append(date.getMonth())
+                .append(" ")
+                .append(date.getYear()));
     }
 }

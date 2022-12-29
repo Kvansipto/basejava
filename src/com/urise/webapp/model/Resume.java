@@ -59,8 +59,16 @@ public class Resume implements Comparable<Resume>, Serializable {
         return contactMap.get(contactType);
     }
 
+    public void setContact(ContactType contactType, String contact) {
+        this.contactMap.replace(contactType, contact);
+    }
+
     public Section getSection(SectionType sectionType) {
         return sectionMap.get(sectionType);
+    }
+
+    public void setSection(SectionType sectionType, Section section) {
+        this.sectionMap.replace(sectionType, section);
     }
 
     public String getUuid() {

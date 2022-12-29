@@ -15,7 +15,7 @@ footer {
     text-align: center;
 }
 
-table {
+.list-table {
     width: 50%;
     text-align: center;
     margin: auto;
@@ -23,12 +23,19 @@ table {
     border-collapse: collapse;
 }
 
-th {
+.view-table {
+    width: 50%;
+    text-align: center;
+    border-collapse: collapse;
+    border: none;
+}
+
+th, tr, td {
     border: 1px solid black;
 }
 
-td {
-    border: 1px solid black;
+.n {
+    border: none;
 }
 
 .text {

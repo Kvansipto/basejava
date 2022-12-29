@@ -255,8 +255,8 @@ public class SqlStorage implements Storage {
                     for (String s : ((ListSection) e.getValue()).getContent()) {
                         sb.append(s).append("\n");
                     }
-                    sb.deleteCharAt(sb.length() - 1);
-                    ps.setString(3, String.valueOf(sb));
+                    String s = String.valueOf(sb);
+                    ps.setString(3, String.valueOf(sb).replace(s.substring(s.lastIndexOf("\n")), ""));
                     ps.execute();
                 }
                 case EXPERIENCE, EDUCATION -> {

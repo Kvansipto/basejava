@@ -13,7 +13,7 @@
 <body>
 <jsp:include page="fragments/header.jsp"/>
 <section>
-    <table>
+    <table class="list-table">
         <tr>
             <th>Имя</th>
             <th>Email</th>
@@ -30,6 +30,10 @@
                 <td><a href="resume?uuid=${resume.uuid}&action=edit"><img src="img/pencil.png"></a></td>
             </tr>
         </c:forEach>
+        <tr>
+            <td><a href="resume?uuid=<%=new Resume("Your name").getUuid()%>&action=edit"><img src="img/add.png"></a>
+            </td>
+        </tr>
     </table>
 </section>
 <jsp:include page="fragments/footer.jsp"/>

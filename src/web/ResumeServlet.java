@@ -1,8 +1,8 @@
 package web;
 
 import com.urise.webapp.Config;
-import com.urise.webapp.model.ContactType;
-import com.urise.webapp.model.Resume;
+import com.urise.webapp.exception.NotExistStorageException;
+import com.urise.webapp.model.*;
 import com.urise.webapp.storage.Storage;
 
 import javax.servlet.ServletConfig;
@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -36,11 +38,29 @@ public class ResumeServlet extends HttpServlet {
                 r.getContactMap().remove(type);
             }
         }
+        for (SectionType sectionType : SectionType.values()) {
+            String value = request.getParameter(sectionType.name());
+            if (value != null && value.trim().length() != 0) {
+                switch (sectionType) {
+                    case PERSONAL, OBJECTIVE -> {
+                        r.addSection(sectionType, new TextSection(value));
+                    }
+                    case QUALIFICATIONS, ACHIEVEMENT -> {
+                        ArrayList<String> list = new ArrayList<>();
+                        Collections.addAll(list, value.split("\\n"));
+                        r.addSection(sectionType, new ListSection(list));
+                    }
+                }
+            } else if (sectionType != SectionType.EDUCATION && sectionType != SectionType.EXPERIENCE) {
+                r.getSectionMap().remove(sectionType);
+            }
+        }
         storage.update(r);
         response.sendRedirect("resume");
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
+            javax.servlet.ServletException, IOException {
         String uuid = request.getParameter("uuid");
         String action = request.getParameter("action");
         if (action == null) {
@@ -55,7 +75,26 @@ public class ResumeServlet extends HttpServlet {
                 response.sendRedirect("resume");
                 return;
             }
-            case "view", "edit" -> resume = storage.get(uuid);
+            case "view" -> {
+                resume = storage.get(uuid);
+            }
+            case "edit" -> {
+                try {
+                    storage.get(uuid);
+                } catch (NotExistStorageException e) {
+                    resume = new Resume(uuid, "Your name");
+                    for (SectionType sectionType : SectionType.values()) {
+                        switch (sectionType) {
+                            case PERSONAL, OBJECTIVE -> resume.sectionMap.put(sectionType, new TextSection(""));
+                            case QUALIFICATIONS, ACHIEVEMENT -> resume.sectionMap.put(sectionType, new ListSection(new ArrayList<>() {{
+                                add("");
+                            }}));
+                        }
+                    }
+                    storage.save(resume);
+                }
+                resume = storage.get(uuid);
+            }
             default -> throw new IllegalArgumentException("Action " + action + " is illegal");
         }
         request.setAttribute("resume", resume);
