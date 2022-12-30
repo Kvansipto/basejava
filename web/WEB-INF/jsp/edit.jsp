@@ -33,22 +33,30 @@
         </c:forEach>
         <hr>
         <c:forEach var="sectionEntry" items="<%=SectionType.values()%>">
-            <%--            <c:set var="section" value="${resume.getSection(sectionEntry)}"/>--%>
+            <c:set var="section" value="${resume.getSection(sectionEntry)}"/>
             <jsp:useBean id="section" class="com.urise.webapp.model.Section"/>
+            <%--            <jsp:useBean id="list" type="com.urise.webapp.model.ListSection"/>--%>
             <c:choose>
                 <c:when test="${sectionEntry=='OBJECTIVE'}">
                     <h2><a>${sectionEntry.title}</a></h2>
                     <input type="text" name="${sectionEntry}" size="90"
-                           value="<%=((TextSection)section).getContent()%>">
+                           value="${section}">
                 </c:when>
                 <c:when test="${sectionEntry=='PERSONAL'}">
                     <h2><a>${sectionEntry.title}</a></h2>
-                    <textarea name="${sectionEntry}" cols=75 rows=5><%=((TextSection) section).getContent()%></textarea>
+                    <textarea name="${sectionEntry}" cols=75 rows=5>${section}</textarea>
                 </c:when>
                 <c:when test="${sectionEntry=='ACHIEVEMENT' || sectionEntry=='QUALIFICATIONS'}">
                     <h2><a>${sectionEntry.title}</a></h2>
+                    <c:choose>
+                        <c:when test="${section == null}">
+                            <textarea name="${sectionEntry}" cols=75 rows=5></textarea>
+                        </c:when>
+                        <c:otherwise>
                     <textarea name="${sectionEntry}" cols=75
                               rows=5><%=String.join("\n", ((ListSection) section).getContent())%></textarea>
+                        </c:otherwise>
+                    </c:choose>
                 </c:when>
             </c:choose>
         </c:forEach>
