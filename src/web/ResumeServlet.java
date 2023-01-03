@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -42,13 +43,10 @@ public class ResumeServlet extends HttpServlet {
             String value = request.getParameter(sectionType.name());
             if (value != null && value.trim().length() != 0) {
                 switch (sectionType) {
-                    case PERSONAL, OBJECTIVE -> {
-                        r.addSection(sectionType, new TextSection(value));
-                    }
+                    case PERSONAL, OBJECTIVE -> r.addSection(sectionType, new TextSection(value));
                     case QUALIFICATIONS, ACHIEVEMENT -> {
-                        ArrayList<String> list = new ArrayList<>();
-                        Collections.addAll(list, value.split("\\n"));
-                        r.addSection(sectionType, new ListSection(list));
+                        r.addSection(sectionType, new ListSection(
+                                new ArrayList<>(Arrays.asList(value.split("\\r\\n")))));
                     }
                 }
             } else if (sectionType != SectionType.EDUCATION && sectionType != SectionType.EXPERIENCE) {
@@ -68,32 +66,39 @@ public class ResumeServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
             return;
         }
-        Resume resume;
+        Resume resume = null;
         switch (action) {
             case "delete" -> {
                 storage.delete(uuid);
                 response.sendRedirect("resume");
                 return;
             }
+
             case "view" -> {
                 resume = storage.get(uuid);
             }
             case "edit" -> {
+
                 try {
-                    storage.get(uuid);
+                    resume = storage.get(uuid);
                 } catch (NotExistStorageException e) {
                     resume = new Resume(uuid, "Your name");
+                    storage.save(resume);
+                } finally {
                     for (SectionType sectionType : SectionType.values()) {
-                        switch (sectionType) {
-                            case PERSONAL, OBJECTIVE -> resume.sectionMap.put(sectionType, new TextSection(""));
-                            case QUALIFICATIONS, ACHIEVEMENT -> resume.sectionMap.put(sectionType, new ListSection(new ArrayList<>() {{
-                                add("");
-                            }}));
+                        if (Objects.requireNonNull(resume).getSection(sectionType) == null) {
+                            switch (sectionType) {
+                                case PERSONAL, OBJECTIVE -> resume.sectionMap.put(sectionType, new TextSection(""));
+                                case QUALIFICATIONS, ACHIEVEMENT -> resume.sectionMap.put(sectionType, new ListSection(new ArrayList<>() {{
+                                    add("");
+                                }}));
+                                case EXPERIENCE, EDUCATION -> resume.sectionMap.put(sectionType, new CompanySection(new ArrayList<>() {{
+                                    add(new Company("", new ArrayList<>()));
+                                }}));
+                            }
                         }
                     }
-                    storage.save(resume);
                 }
-                resume = storage.get(uuid);
             }
             default -> throw new IllegalArgumentException("Action " + action + " is illegal");
         }

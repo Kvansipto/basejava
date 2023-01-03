@@ -184,7 +184,11 @@ public class SqlStorage implements Storage {
             String content = rs.getString("text");
             switch (sectionType) {
                 case PERSONAL, OBJECTIVE -> r.addSection(sectionType, new TextSection(content));
-                case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(sectionType, new ListSection(Arrays.stream(content.split("\n")).toList()));
+                case ACHIEVEMENT, QUALIFICATIONS -> {
+                    List<String> list = new ArrayList<>();
+                    Collections.addAll(list, content.split("\\n"));
+                    r.addSection(sectionType, new ListSection(list));
+                }
                 case EXPERIENCE, EDUCATION -> r.addSection(sectionType, new CompanySection(addCompanySection(rs, r)));
             }
         }
@@ -256,7 +260,7 @@ public class SqlStorage implements Storage {
                         sb.append(s).append("\n");
                     }
                     String s = String.valueOf(sb);
-                    ps.setString(3, String.valueOf(sb).replace(s.substring(s.lastIndexOf("\n")), ""));
+                    ps.setString(3, String.valueOf(sb).trim());
                     ps.execute();
                 }
                 case EXPERIENCE, EDUCATION -> {

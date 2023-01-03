@@ -1,6 +1,7 @@
 package web;
 
-import com.urise.webapp.model.*;
+import com.urise.webapp.model.Company;
+import com.urise.webapp.model.ContactType;
 
 import java.time.LocalDate;
 
@@ -21,32 +22,8 @@ public class HtmlUtil {
         return (value == null) ? "" : contactType.getTitle() + ": " + value;
     }
 
-    public static String toHtml(SectionType sectionType, Section section) {
-        switch (sectionType) {
-            case PERSONAL, OBJECTIVE -> {
-                return (((TextSection) section).getContent());
-            }
-            case QUALIFICATIONS, ACHIEVEMENT -> {
-                StringBuilder sb = new StringBuilder();
-                for (String s : ((ListSection) section).getContent()) {
-                    sb.append(s).append("\n");
-                }
-                sb.replace(sb.lastIndexOf("\n"), sb.length(), "");
-                return String.valueOf(sb);
-            }
-            case EXPERIENCE, EDUCATION -> {
-                return "pusto";
-            }
-        }
-        return null;
-    }
-
     public static String toHtml(String value) {
-        return toLink(value, value);
-    }
-
-    public static String toHtml(SectionType sectionType) {
-        return "<h3>" + sectionType.getTitle() + "</h3>";
+        return value == null ? "" : toLink(value, value);
     }
 
     private static String toLink(String href, String title) {
